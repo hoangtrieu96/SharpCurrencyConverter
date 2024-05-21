@@ -9,7 +9,7 @@ A currency converter application built using microservices and event-driven arch
 
 Below is the system architecture diagram that illustrates the main components and their interactions:
 
-![System Architecture Diagram](./Assets/ReadMe_Images/architecture_diagram.drawio.png)
+![System Architecture Diagram](./Assets/ReadMe_Images/architecture_diagram.png)
 
 ### Components
 
@@ -23,7 +23,7 @@ There are three main components:
 
 Other Components:
 + **NGINX** as an API gateway.
-+ **RabbitMQ** as a message queue for incoming requests.
++ **RabbitMQ** as a message queue for incoming requests and another for rate changes from the **Currency Rate Service**.
 + **SQL Server** as a database for currency rates.
 + **Redis** as a cache storage for recently requested exchange rates.
 + Rate limiters will also be applied where relevant.
