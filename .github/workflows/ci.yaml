@@ -33,7 +33,7 @@ jobs:
       env:
         TAG: ${{ github.sha }}
       run: |
-        docker buildx build --file CurrencyRateService/Dockerfile --tag trieuhoangnguyen/currencyrateservice:$TAG --push .
+        docker buildx build --build-arg BASE_PATH=CurrencyRateService --file CurrencyRateService/Dockerfile --tag trieuhoangnguyen/currencyrateservice:$TAG --push .
 
     - name: Tag image as latest
       if: github.ref == 'refs/heads/main'
