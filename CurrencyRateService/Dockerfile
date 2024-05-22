@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Restore separately so it can cache
 COPY *.csproj ./
-RUN dotnet restore
+RUN dotnet restore CurrencyRateService.csproj
 
 # Copy the rest of the code
 COPY . ./
