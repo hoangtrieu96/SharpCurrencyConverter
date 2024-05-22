@@ -30,13 +30,17 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Build Docker image
+      env:
+        TAG: ${{ github.sha }}
       run: |
-        TAG=${{ github.sha }}
         docker buildx build --file CurrencyRateService/Dockerfile --tag trieuhoangnguyen/currencyrateservice:$TAG --push .
 
     - name: Tag image as latest
       if: github.ref == 'refs/heads/main'
+      env:
+        TAG: ${{ github.sha }}
       run: |
+        TAG=${{ github.sha }}
         docker pull trieuhoangnguyen/currencyrateservice:$TAG
         docker tag trieuhoangnguyen/currencyrateservice:$TAG trieuhoangnguyen/currencyrateservice:latest
         docker push trieuhoangnguyen/currencyrateservice:latest
