@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option csharp_namespace = "CurrencyRateService";
+
+service GrpcCurrencyRate {
+    rpc GetRateFromTo (RateFromToRequest) returns (RateFromToResponse); 
+}
+
+message RateFromToRequest {
+    string from_currency_code = 1;
+    string to_currency_code = 2;
+}
+
+message RateFromToResponse {
+    string from_currency_code = 1;
+    string from_currency_name = 2;
+    string from_currency_rate = 3; 
+    string to_currency_code = 4;
+    string to_currency_name = 5;
+    string to_currency_rate = 6; 
+    int64 updated_at_timestamp = 7;
+}
