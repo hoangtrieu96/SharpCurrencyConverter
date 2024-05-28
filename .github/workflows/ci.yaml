@@ -33,11 +33,8 @@ jobs:
       env:
         SA_PASSWORD: ${{ secrets.SA_PASSWORD }}
         CurrencyRateEndpoint: ${{ secrets.CurrencyRateEndpoint }}
-        ConnectionStrings__CurrencyRateConnection: ${{ env.CONNECTION_STRING }}
+        ConnectionStrings__CurrencyRateConnection: ${{ secrets.CONNECTIONSTRINGS__CURRENCYRATECONNECTION }}
       run: |
-        echo "SA_PASSWORD=${{ secrets.SA_PASSWORD }}" > .env
-        echo "CurrencyRateEndpoint=${{ secrets.CurrencyRateEndpoint }}" >> .env
-        echo "ConnectionStrings__CurrencyRateConnection=${{ env.CONNECTION_STRING }}" >> .env
         docker-compose -f docker-compose.ci-test.yaml up --build --abort-on-container-exit --exit-code-from currencyratetest
 
     - name: Upload CurrencyRateService test results
