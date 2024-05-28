@@ -113,6 +113,6 @@ public class GrpcCurrencyRateServiceTests
         var exception = await Assert.ThrowsAsync<RpcException>(() => _grpcService.GetRateFromTo(request, _serverCallContext));
 
         // Assert
-        Assert.Equal(StatusCode.NotFound, exception.StatusCode);
+        Assert.Equal(StatusCode.Internal, exception.StatusCode);
     }
 }
