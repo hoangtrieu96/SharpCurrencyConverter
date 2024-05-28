@@ -39,7 +39,7 @@ jobs:
 
     - name: Upload CurrencyRateService test results
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: CurrencyRateService-TestResults
         path: CurrencyRateService.Tests/TestResults/*.trx
