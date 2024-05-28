@@ -30,7 +30,15 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Build and run tests using Docker Compose
-      run: docker-compose -f docker-compose.ci-test.yaml up --build --abort-on-container-exit --exit-code-from currencyratetest
+      env:
+        SA_PASSWORD: ${{ secrets.SA_PASSWORD }}
+        CurrencyRateEndpoint: ${{ secrets.CurrencyRateEndpoint }}
+        ConnectionStrings__CurrencyRateConnection: ${{ env.CONNECTION_STRING }}
+      run: |
+        echo "SA_PASSWORD=${{ secrets.SA_PASSWORD }}" > .env
+        echo "CurrencyRateEndpoint=${{ secrets.CurrencyRateEndpoint }}" >> .env
+        echo "ConnectionStrings__CurrencyRateConnection=${{ env.CONNECTION_STRING }}" >> .env
+        docker-compose -f docker-compose.ci.yaml up --build --abort-on-container-exit --exit-code-from currencyratetest
 
     - name: Upload CurrencyRateService test results
       if: always()
@@ -38,7 +46,6 @@ jobs:
       with:
         name: CurrencyRateService-TestResults
         path: CurrencyRateService.Tests/TestResults/*.trx
-
     
     - name: Build CurrencyRateService Docker image
       env:
