@@ -36,7 +36,8 @@ services:
     volumes:
       - .:/app
     working_dir: /app
-    entrypoint: ["sh", "-c", "dotnet restore CurrencyRateService.Tests/CurrencyRateService.Tests.csproj && dotnet test CurrencyRateService.Tests/CurrencyRateService.Tests.csproj --logger:trx"]    depends_on:
+    entrypoint: ["sh", "-c", "dotnet restore CurrencyRateService.Tests/CurrencyRateService.Tests.csproj && dotnet test CurrencyRateService.Tests/CurrencyRateService.Tests.csproj --logger:trx"]    
+    depends_on:
       - currencyrateservice
     networks:
       - currency_network
