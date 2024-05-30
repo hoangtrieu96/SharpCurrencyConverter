@@ -60,8 +60,6 @@ public class CurrencyRateFetcher : BackgroundService
                                                 ?? throw new JsonException("Failed to parse the response.");
 
             await UpsertCurrencyRates(exchangeRateAPIReadDTO);
-
-            Console.WriteLine("--> Data loaded.");
         }
         catch (Exception ex)
         {
