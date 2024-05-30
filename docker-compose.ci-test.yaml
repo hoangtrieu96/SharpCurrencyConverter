@@ -27,8 +27,7 @@ services:
       - CurrencyRateEndpoint=${CurrencyRateEndpoint}
       - ConnectionStrings__CurrencyRateConnection=${ConnectionStrings__CurrencyRateConnection}
     depends_on:
-      sqlserver:
-        condition: service_completed_successfully
+      - sqlserver
     networks:
       - currency_network
 
