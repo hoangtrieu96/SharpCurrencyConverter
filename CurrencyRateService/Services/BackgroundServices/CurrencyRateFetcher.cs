@@ -5,9 +5,8 @@ using CurrencyRateService.Data;
 using CurrencyRateService.DTOs;
 using CurrencyRateService.Models;
 using CurrencyRateService.Utility;
-using Microsoft.IdentityModel.Tokens;
 
-namespace CurrencyRateService.Services;
+namespace CurrencyRateService.Services.BackgroundServices;
 
 public class CurrencyRateFetcher : BackgroundService
 {

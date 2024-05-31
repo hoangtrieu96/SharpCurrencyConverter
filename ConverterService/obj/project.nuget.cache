@@ -1,11 +1,17 @@
 {
   "version": 2,
-  "dgSpecHash": "kb5RejMP/SN/XynruKiyKEiHzY1tvYjrqu7TQ8ZsltklKZtg9pRnr+lWE4zRiUaTud561+rc5tGN3T02mIvZaA==",
+  "dgSpecHash": "hq48WZVYtsoU2zB6AoxQVHqm66772lT53jGzE9JGdRZViH4otQOWA1OcQBA/800kVCOkbH1NdDAm9+WisCaPdA==",
   "success": true,
   "projectFilePath": "/media/trieunguyen/DataSSD/Code/SharpCurrencyConverter/ConverterService/ConverterService.csproj",
   "expectedPackageFiles": [
+    "/home/trieunguyen/.nuget/packages/google.protobuf/3.27.0/google.protobuf.3.27.0.nupkg.sha512",
+    "/home/trieunguyen/.nuget/packages/grpc.core.api/2.63.0/grpc.core.api.2.63.0.nupkg.sha512",
+    "/home/trieunguyen/.nuget/packages/grpc.net.client/2.63.0/grpc.net.client.2.63.0.nupkg.sha512",
+    "/home/trieunguyen/.nuget/packages/grpc.net.common/2.63.0/grpc.net.common.2.63.0.nupkg.sha512",
+    "/home/trieunguyen/.nuget/packages/grpc.tools/2.64.0/grpc.tools.2.64.0.nupkg.sha512",
     "/home/trieunguyen/.nuget/packages/microsoft.aspnetcore.openapi/8.0.5/microsoft.aspnetcore.openapi.8.0.5.nupkg.sha512",
     "/home/trieunguyen/.nuget/packages/microsoft.extensions.apidescription.server/6.0.5/microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
+    "/home/trieunguyen/.nuget/packages/microsoft.extensions.logging.abstractions/6.0.0/microsoft.extensions.logging.abstractions.6.0.0.nupkg.sha512",
     "/home/trieunguyen/.nuget/packages/microsoft.openapi/1.4.3/microsoft.openapi.1.4.3.nupkg.sha512",
     "/home/trieunguyen/.nuget/packages/swashbuckle.aspnetcore/6.4.0/swashbuckle.aspnetcore.6.4.0.nupkg.sha512",
     "/home/trieunguyen/.nuget/packages/swashbuckle.aspnetcore.swagger/6.4.0/swashbuckle.aspnetcore.swagger.6.4.0.nupkg.sha512",

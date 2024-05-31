@@ -1,21 +1,29 @@
+using AutoMapper;
 using CurrencyRateService.Data;
 using CurrencyRateService.Models;
-using CurrencyRateService.Services;
+using CurrencyRateService.Profiles;
+using CurrencyRateService.Services.SyncDataServices;
 using FakeItEasy;
 using Grpc.Core;
 
-namespace CurrencyRateService.Tests.Services;
+namespace CurrencyRateService.Tests.Services.SyncDataServices;
 
 public class GrpcCurrencyRateServiceTests
 {
     private readonly ICurrencyRateRepo _fakeCurrencyRateRepo;
     private readonly GrpcCurrencyRateService _grpcService;
     private readonly ServerCallContext _serverCallContext;
+    private readonly IMapper _mapper;
 
     public GrpcCurrencyRateServiceTests()
     {
+        var config = new MapperConfiguration(cfg =>
+        {
+            cfg.AddProfile<CurrencyRateProfile>();
+        });
+        _mapper = config.CreateMapper();
         _fakeCurrencyRateRepo = A.Fake<ICurrencyRateRepo>();
-        _grpcService = new GrpcCurrencyRateService(_fakeCurrencyRateRepo);
+        _grpcService = new GrpcCurrencyRateService(_fakeCurrencyRateRepo, _mapper);
         _serverCallContext = A.Fake<ServerCallContext>();
     }
 
@@ -67,13 +75,17 @@ public class GrpcCurrencyRateServiceTests
 
         // Assert
         Assert.IsType<RateFromToResponse>(response);
-        Assert.Equal(fromCurrencyCode, response.FromCurrencyCode);
-        Assert.Equal(fromCurrencyName, response.FromCurrencyName);
-        Assert.Equal(fromRateToUSD.ToString(), response.FromCurrencyRate);
-        Assert.Equal(toCurrencyCode, response.ToCurrencyCode);
-        Assert.Equal(toCurrencyName, response.ToCurrencyName);
-        Assert.Equal(toRateToUSD.ToString(), response.ToCurrencyRate);
-        Assert.Equal(nextUpdateAt, response.UpdatedAtTimestamp);
+        Assert.Equal(2, response.Rates.Count);
+
+        Assert.Equal(fromCurrencyCode, response.Rates[0].CurrencyCode);
+        Assert.Equal(fromCurrencyName, response.Rates[0].CurrencyName);
+        Assert.Equal(fromRateToUSD.ToString(), response.Rates[0].RateToUsd);
+        Assert.Equal(updatedAt, response.Rates[0].UpdatedAt);
+
+        Assert.Equal(toCurrencyCode, response.Rates[1].CurrencyCode);
+        Assert.Equal(toCurrencyName, response.Rates[1].CurrencyName);
+        Assert.Equal(toRateToUSD.ToString(), response.Rates[1].RateToUsd);
+        Assert.Equal(updatedAt, response.Rates[1].UpdatedAt);
     }
 
     [Fact]
@@ -88,7 +100,7 @@ public class GrpcCurrencyRateServiceTests
 
         // Act
         var exception = await Assert.ThrowsAsync<RpcException>(() => _grpcService.GetRateFromTo(request, _serverCallContext));
-        
+
         // Assert
         Assert.Equal(StatusCode.InvalidArgument, exception.StatusCode);
     }
@@ -102,7 +114,7 @@ public class GrpcCurrencyRateServiceTests
 
         A.CallTo(() => _fakeCurrencyRateRepo.GetRateByCurrencyCode(fromCurrencyCode))
             .Returns(Task.FromResult<CurrencyRate?>(null));
-        
+
         var request = new RateFromToRequest
         {
             FromCurrencyCode = fromCurrencyCode,

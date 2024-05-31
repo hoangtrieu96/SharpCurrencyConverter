@@ -1,5 +1,6 @@
 using CurrencyRateService.Data;
-using CurrencyRateService.Services;
+using CurrencyRateService.Services.BackgroundServices;
+using CurrencyRateService.Services.SyncDataServices;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
