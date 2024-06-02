@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <Protobuf Include="Protos/currency_rate.proto" GrpcServices="Client" />
+    <Protobuf Include="Protos/converter.proto" GrpcServices="Server" />
   </ItemGroup>
 
 </Project>
