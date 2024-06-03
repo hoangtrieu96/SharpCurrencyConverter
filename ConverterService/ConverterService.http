@@ -1,6 +1,0 @@
-@ConverterService_HostAddress = http://localhost:5150
-
-GET {{ConverterService_HostAddress}}/
-Accept: application/json
-
-###
