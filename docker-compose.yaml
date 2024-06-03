@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    ports:
+      - "1433:1433"
+    environment:
+      SA_PASSWORD: "${SA_PASSWORD}"
+      ACCEPT_EULA: "Y"
+    volumes:
+      - sql_data:/var/opt/mssql
+    networks:
+      - currency_network
+
+  currencyrateservice:
+    image: trieuhoangnguyen/currencyrateservice:latest
+    container_name: currencyrateservice
+    ports:
+      - "8080:8080"
+    environment:
+      - CurrencyRateEndpoint=${CurrencyRateEndpoint}
+      - ConnectionStrings__CurrencyRateConnection=${ConnectionStrings__CurrencyRateConnection}
+    depends_on:
+      - sqlserver
+    networks:
+      - currency_network
+
+
+networks:
+  currency_network:
+
+volumes:
+  sql_data:

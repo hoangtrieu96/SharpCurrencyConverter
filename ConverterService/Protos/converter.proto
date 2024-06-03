@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option csharp_namespace = "ConverterService";
+
+service GrpcConverter {
+    rpc GetConversionResult (ConversionResultRequest) returns (ConversionResultResponse);
+}
+
+message ConversionResultRequest {
+    string from_currency_code = 1;
+    string to_currency_code = 2;
+    string amount = 3;
+}
+
+message ConversionResultResponse {
+    string converted_amount = 1;
+    string reserved_converted_amount = 2;
+}
