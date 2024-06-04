@@ -25,7 +25,7 @@ public class CurrencyRateRepo : ICurrencyRateRepo
     public async Task<CurrencyRate?> GetRateByCurrencyCode(string CurrencyCode)
     {
         return await _context.CurrencyRates
-            .Where(x => x.CurrencyCode == CurrencyCode)
+            .Where(x => x.CurrencyCode == CurrencyCode.ToUpper())
             .FirstOrDefaultAsync();
     }
 

@@ -80,7 +80,7 @@ public class CurrencyRateFetcher : BackgroundService
 
                 CurrencyRateWriteDTO rateWriteDTO = new CurrencyRateWriteDTO
                 {
-                    CurrencyCode = rate.Key,
+                    CurrencyCode = rate.Key.ToUpper(),
                     CurrencyName = currencyName,
                     RateToUSD = rate.Value,
                     UpdatedAt = exchangeRateAPIReadDTO.TimeLastUpdateUnix,
