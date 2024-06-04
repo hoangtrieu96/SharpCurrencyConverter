@@ -50,6 +50,12 @@ jobs:
       run: |
         docker buildx build --build-arg BASE_PATH=CurrencyRateService --file CurrencyRateService/Dockerfile --tag trieuhoangnguyen/currencyrateservice:$TAG --push .
 
+    - name: Build ConverterService Docker image
+      env:
+        TAG: ${{ github.sha }}
+      run: |
+        docker buildx build --build-arg BASE_PATH=ConverterService --file ConverterService/Dockerfile --tag trieuhoangnguyen/converterservice:$TAG --push .
+
     - name: Tag CurrencyRateService image as latest
       if: github.ref == 'refs/heads/main'
       env:
@@ -59,3 +65,13 @@ jobs:
         docker pull trieuhoangnguyen/currencyrateservice:$TAG
         docker tag trieuhoangnguyen/currencyrateservice:$TAG trieuhoangnguyen/currencyrateservice:latest
         docker push trieuhoangnguyen/currencyrateservice:latest
+
+    - name: Tag ConverterService image as latest
+      if: github.ref == 'refs/heads/main'
+      env:
+        TAG: ${{ github.sha }}
+      run: |
+        TAG=${{ github.sha }}
+        docker pull trieuhoangnguyen/converterservice:$TAG
+        docker tag trieuhoangnguyen/converterservice:$TAG trieuhoangnguyen/converterservice:latest
+        docker push trieuhoangnguyen/converterservice:latest
