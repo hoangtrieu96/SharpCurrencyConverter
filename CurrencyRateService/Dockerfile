@@ -1,5 +1,5 @@
 ### Stage 1: Build the application
-FROM mcr.microsoft.com/dotnet/sdk:8.0-jammy-amd64 AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 WORKDIR /app
 
 # Define an argument for the base path with a default value
