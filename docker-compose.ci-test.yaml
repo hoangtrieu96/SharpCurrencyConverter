@@ -46,7 +46,7 @@ services:
     ports:
       - "8081:8080"
     environment:
-      - GrpcCurrencyRateService=currencyrateservice
+      - GrpcCurrencyRateService=http://currencyrateservice:8080
     depends_on:
       - currencyrateservice
     networks:
