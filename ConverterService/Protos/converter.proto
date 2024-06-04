@@ -2,8 +2,14 @@ syntax = "proto3";
 
 option csharp_namespace = "ConverterService";
 
+import "google/api/annotations.proto";
+
 service GrpcConverter {
-    rpc GetConversionResult (ConversionResultRequest) returns (ConversionResultResponse);
+    rpc GetConversionResult (ConversionResultRequest) returns (ConversionResultResponse) {  
+        option (google.api.http) = {
+            get: "/api/v1/converter"
+        };
+    };
 }
 
 message ConversionResultRequest {
