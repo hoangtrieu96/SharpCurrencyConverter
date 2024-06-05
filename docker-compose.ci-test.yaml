@@ -59,6 +59,7 @@ services:
       - GrpcCurrencyRateService=http://currencyrateservice:8080
       - Redis__ConnectionString=redis:6379
     depends_on:
+      - redis
       - currencyrateservice
     networks:
       - currency_network
