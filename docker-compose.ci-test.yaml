@@ -40,6 +40,12 @@ services:
     networks:
       - currency_network
 
+  redis:
+    image: redis:latest
+    container_name: my_redis
+    ports:
+      - "6379:6379"
+
   converterservice:
     build:
       context: .
@@ -51,6 +57,7 @@ services:
       - "8081:8080"
     environment:
       - GrpcCurrencyRateService=http://currencyrateservice:8080
+      - Redis__ConnectionString=redis:6379
     depends_on:
       - currencyrateservice
     networks:

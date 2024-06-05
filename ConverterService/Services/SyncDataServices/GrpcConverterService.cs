@@ -1,4 +1,6 @@
+using ConverterService.Data;
 using CurrencyRateService;
+using CurrencyRateService.Models;
 using Grpc.Core;
 
 namespace ConverterService.Services.SyncDataServices;
@@ -6,28 +8,39 @@ namespace ConverterService.Services.SyncDataServices;
 public class GrpcConverterService : GrpcConverter.GrpcConverterBase
 {
     private readonly ICurrencyRateClient _currencyRateClient;
+    private readonly ICacheService<decimal?> _cacheService;
 
-    public GrpcConverterService(ICurrencyRateClient currencyRateClient)
+    public GrpcConverterService(ICurrencyRateClient currencyRateClient, ICacheService<decimal?> cacheService)
     {
         _currencyRateClient = currencyRateClient;
+        _cacheService = cacheService;
     }
 
     public override async Task<ConversionResultResponse> GetConversionResult(ConversionResultRequest request, ServerCallContext context)
     {
         ValidateConversionResultRequest(request);
 
-        // Retrieve currency rates
-        (decimal fromRate, decimal toRate) = await GetRates(request.FromCurrencyCode, request.ToCurrencyCode);
+        // Retrieve currency rates from cache first, if not found, fetch from CurrencyRateService
+        decimal? fromRate = await _cacheService.GetAsync(request.FromCurrencyCode);
+        decimal? toRate = await _cacheService.GetAsync(request.ToCurrencyCode);
+        if (!fromRate.HasValue || !toRate.HasValue)
+        {
+            (fromRate, toRate) = await GetRates(request.FromCurrencyCode, request.ToCurrencyCode);
+            
+            // Update cache with latest rates
+            await _cacheService.SetAsync(request.FromCurrencyCode, fromRate, TimeSpan.FromMinutes(10));
+            await _cacheService.SetAsync(request.ToCurrencyCode, toRate, TimeSpan.FromMinutes(10));
+        }
 
         // Convert amount
-        decimal conversionRate = toRate / fromRate;
-        decimal reversedConversionRate = fromRate / toRate;
+        decimal conversionRate = toRate.Value / fromRate.Value;
+        decimal reversedConversionRate = fromRate.Value / toRate.Value;
         decimal amount = decimal.Parse(request.Amount);
 
         var response = new ConversionResultResponse()
         {
-            ConvertedAmount = (amount * conversionRate).ToString("F2"),
-            ReservedConvertedAmount = (amount * reversedConversionRate).ToString("F2")
+            ConvertedAmount = (amount * conversionRate).ToString("F6"),
+            ReservedConvertedAmount = (amount * reversedConversionRate).ToString("F6")
         };
 
         return response;

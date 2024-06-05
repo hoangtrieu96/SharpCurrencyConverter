@@ -25,17 +25,11 @@ services:
     networks:
       - currency_network
 
-  converterservice:
-    image: trieuhoangnguyen/converterservice:latest
-    container_name: converterservice
+  redis:
+    image: redis:latest
+    container_name: my_redis
     ports:
-      - "8081:8080"
-    environment:
-      - GrpcCurrencyRateService=http://currencyrateservice:8080
-    depends_on:
-      - currencyrateservice
-    networks:
-      - currency_network
+      - "6379:6379"
 
 networks:
   currency_network:

@@ -1,5 +1,7 @@
+using ConverterService.Data;
 using ConverterService.Services.SyncDataServices;
 using Microsoft.OpenApi.Models;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 {
@@ -12,6 +14,8 @@ var builder = WebApplication.CreateBuilder(args);
     {
         conf.SwaggerDoc("v1", new OpenApiInfo { Title = "Sharp Currency Converter API", Version = "v1" });
     });
+    builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration["Redis:ConnectionString"]!));
+    builder.Services.AddScoped(typeof(ICacheService<>), typeof(CacheServiceRedis<>));
 }
 
 var app = builder.Build();
