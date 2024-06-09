@@ -9,6 +9,7 @@ services:
       - sql_data:/var/opt/mssql
     networks:
       - currency_network
+    platform: linux/amd64
 
   currencyrateservice: # Container port: 8080
     build:
@@ -24,6 +25,7 @@ services:
       - sqlserver
     networks:
       - currency_network
+    platform: linux/amd64
 
   currencyratetest:
     image: mcr.microsoft.com/dotnet/sdk:8.0
@@ -35,10 +37,12 @@ services:
       - currencyrateservice
     networks:
       - currency_network
+    platform: linux/amd64
 
   redis: # Container port: 6379
     image: redis:latest
     container_name: my_redis
+    platform: linux/amd64
 
   converterservice: # Container port: 8080
     build:
@@ -55,6 +59,21 @@ services:
       - currencyrateservice
     networks:
       - currency_network
+    platform: linux/amd64
+
+  nginx: # Container port: 80
+    image: nginx:latest
+    container_name: nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports: 
+      - "80:80"
+    depends_on:
+      - currencyrateservice
+      - converterservice
+    networks:
+      - currency_network
+    platform: linux/amd64
 
 networks:
   currency_network:
