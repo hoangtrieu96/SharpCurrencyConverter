@@ -37,6 +37,19 @@ services:
     networks:
       - currency_network
 
+  nginx: # Container port: 80
+    image: nginx:latest
+    container_name: nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports: 
+      - "80:80"
+    depends_on:
+      - currencyrateservice
+      - converterservice
+    networks:
+      - currency_network
+
 networks:
   currency_network:
 
