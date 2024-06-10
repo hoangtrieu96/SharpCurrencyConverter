@@ -25,7 +25,9 @@ services:
 
   redis: # Container port: 6379
     image: redis:latest
-    container_name: my_redis
+    container_name: redis
+    networks:
+      - currency_network
     platform: linux/amd64
 
   converterservice: # Container port: 8080
