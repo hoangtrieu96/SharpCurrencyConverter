@@ -1,4 +1,5 @@
 using CurrencyRateService.Data;
+using CurrencyRateService.Services.AsyncDataServices;
 using CurrencyRateService.Services.BackgroundServices;
 using CurrencyRateService.Services.SyncDataServices;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
         opt.UseSqlServer(builder.Configuration["ConnectionStrings:CurrencyRateConnection"])
     );
     builder.Services.AddScoped<ICurrencyRateRepo, CurrencyRateRepo>();
+    builder.Services.AddSingleton<IMessageQueueProducer, MessageQueueProducer>();
     builder.Services.AddHostedService<CurrencyRateFetcher>();
     builder.Services.AddAutoMapper(typeof(Program));
     builder.Services.AddHttpClient();
