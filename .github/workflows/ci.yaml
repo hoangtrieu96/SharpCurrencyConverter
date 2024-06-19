@@ -36,8 +36,6 @@ jobs:
         ConnectionStrings__CurrencyRateConnection: ${{ secrets.CONNECTIONSTRINGS__CURRENCYRATECONNECTION }}
         RabbitMQ__User: ${{ secrets.RABBITMQ__USER }}
         RabbitMQ__Password: ${{ secrets.RABBITMQ__PASSWORD }}
-        RABBITMQ_DEFAULT_USER: ${{ secrets.RABBITMQ__USER }}
-        RABBITMQ_DEFAULT_PASS: ${{ secrets.RABBITMQ__PASSWORD }}
       run: |
         docker-compose -f docker-compose.ci-test.yaml up --build --abort-on-container-exit --exit-code-from currencyratetest
 
