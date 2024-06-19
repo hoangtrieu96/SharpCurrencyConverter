@@ -21,6 +21,8 @@ services:
     environment:
       - CurrencyRateEndpoint=${CurrencyRateEndpoint}
       - ConnectionStrings__CurrencyRateConnection=${ConnectionStrings__CurrencyRateConnection}
+      - RabbitMQ__User=${RabbitMQ__User}
+      - RabbitMQ__Password=${RabbitMQ__Password}
       - RabbitMQ__Host=rabbitmq
       - RabbitMQ__Port=5672
       - RabbitMQ__RateUpdateMQ__ExchangeName=rate_update
@@ -60,6 +62,8 @@ services:
     environment:
       - GrpcCurrencyRateService=http://currencyrateservice:8080
       - Redis__ConnectionString=redis:6379,abortConnect=false
+      - RabbitMQ__User=${RabbitMQ__User}
+      - RabbitMQ__Password=${RabbitMQ__Password}
       - RabbitMQ__Host=rabbitmq
       - RabbitMQ__Port=5672
       - RabbitMQ__RateUpdateMQ__ExchangeName=rate_update
