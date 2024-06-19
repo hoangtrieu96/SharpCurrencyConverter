@@ -29,6 +29,7 @@ services:
       - RabbitMQ__RateUpdateMQ__RoutingKey=rate_update
     depends_on:
       - sqlserver
+      - rabbitmq
     networks:
       - currency_network
     platform: linux/amd64
@@ -71,6 +72,7 @@ services:
     depends_on:
       - redis
       - currencyrateservice
+      - rabbitmq
     networks:
       - currency_network
     platform: linux/amd64
