@@ -21,6 +21,10 @@ services:
     environment:
       - CurrencyRateEndpoint=${CurrencyRateEndpoint}
       - ConnectionStrings__CurrencyRateConnection=${ConnectionStrings__CurrencyRateConnection}
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Port=5672
+      - RabbitMQ__RateUpdateMQ__ExchangeName=rate_update
+      - RabbitMQ__RateUpdateMQ__RoutingKey=rate_update
     depends_on:
       - sqlserver
     networks:
@@ -56,6 +60,10 @@ services:
     environment:
       - GrpcCurrencyRateService=http://currencyrateservice:8080
       - Redis__ConnectionString=redis:6379,abortConnect=false
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Port=5672
+      - RabbitMQ__RateUpdateMQ__ExchangeName=rate_update
+      - RabbitMQ__RateUpdateMQ__RoutingKey=rate_update
     depends_on:
       - redis
       - currencyrateservice

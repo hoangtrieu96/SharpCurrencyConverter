@@ -13,8 +13,8 @@ public class GrpcConverterService : GrpcConverter.GrpcConverterBase
 
     public GrpcConverterService(ICurrencyRateClient currencyRateClient, ICacheService<Dictionary<string, decimal>?> cacheService)
     {
-        _currencyRateClient = currencyRateClient;
-        _cacheService = cacheService;
+        _currencyRateClient = currencyRateClient ?? throw new ArgumentNullException(nameof(currencyRateClient));
+        _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
     }
 
     public override async Task<ConversionResultResponse> GetConversionResult(ConversionResultRequest request, ServerCallContext context)

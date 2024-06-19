@@ -44,7 +44,7 @@ public class CurrencyRateFetcher : BackgroundService
         while (!stoppingToken.IsCancellationRequested)
         {
             await FetchCurrencyRates();
-            await Task.Delay(600000, stoppingToken);
+            await Task.Delay(300000, stoppingToken);
         }
 
         _logger.LogInformation($"{nameof(CurrencyRateFetcher)} stopped");
@@ -65,7 +65,7 @@ public class CurrencyRateFetcher : BackgroundService
             await UpsertCurrencyRates(exchangeRateAPIReadDTO);
 
             // Send an event to message queue to notify other services that the currency rate data has been updated
-            
+            _messageQueueProducer.PublishRateUpdateEvent();
         }
         catch (Exception ex)
         {
@@ -76,7 +76,7 @@ public class CurrencyRateFetcher : BackgroundService
     private async Task UpsertCurrencyRates(ExchangeRateAPIReadDTO exchangeRateAPIReadDTO)
     {
         using var scope = _serviceProvider.CreateScope();
-        ICurrencyRateRepo _currencyRateRepo = scope.ServiceProvider.GetRequiredService<ICurrencyRateRepo>();
+        ICurrencyRateRepo currencyRateRepo = scope.ServiceProvider.GetRequiredService<ICurrencyRateRepo>();
         
         foreach (var rate in exchangeRateAPIReadDTO.ConversionRates)
         {
@@ -94,13 +94,10 @@ public class CurrencyRateFetcher : BackgroundService
                     NextUpdateAt = exchangeRateAPIReadDTO.TimeNextUpdateUnix
                 };
 
-                await _currencyRateRepo.UpsertRate(_mapper.Map<CurrencyRate>(rateWriteDTO));
+                await currencyRateRepo.UpsertRate(_mapper.Map<CurrencyRate>(rateWriteDTO));
             }
         }
 
-        await _currencyRateRepo.SaveChanges();
-
-        // Send event to message queue
-        _messageQueueProducer.PublishRateUpdateEvent();
+        await currencyRateRepo.SaveChanges();
     }
 }

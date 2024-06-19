@@ -32,7 +32,7 @@ public class MessageQueueProducer : IMessageQueueProducer, IDisposable
             _connection = factory.CreateConnection();
             _channel = _connection.CreateModel();
 
-            var _exchangeName = _configuration["RabbitMQ:RateUpdateMQ:ExchangeName"];
+            _exchangeName = _configuration["RabbitMQ:RateUpdateMQ:ExchangeName"];
             _channel.ExchangeDeclare(exchange: _exchangeName, type: ExchangeType.Direct);
             _connection.ConnectionShutdown += RabbitMQ_ConnectionShutdown;
         }
@@ -48,7 +48,6 @@ public class MessageQueueProducer : IMessageQueueProducer, IDisposable
         _channel?.Dispose();
         _connection?.Close();
         _connection?.Dispose();
-
     }
 
     public void PublishRateUpdateEvent()
