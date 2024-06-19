@@ -71,7 +71,7 @@ services:
       - currency_network
     platform: linux/amd64
 
-  rabbitmq:
+  rabbitmq: # Container port: 5672, 15672
     image: rabbitmq:3-management
     container_name: rabbitmq
     ports:
@@ -82,7 +82,6 @@ services:
       RABBITMQ_DEFAULT_PASS: "${RabbitMQ__Password}"
     networks:
       - currency_network
-    platform: linux/amd64
 
 networks:
   currency_network:

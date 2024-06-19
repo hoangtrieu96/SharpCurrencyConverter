@@ -94,15 +94,11 @@ services:
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
-    ports:
-      - "5672:5672"   # RabbitMQ server port
-      - "15672:15672" # Management plugin web interface
     environment:
       RABBITMQ_DEFAULT_USER: "${RabbitMQ__User}"
       RABBITMQ_DEFAULT_PASS: "${RabbitMQ__Password}"
     networks:
       - currency_network
-    platform: linux/amd64
 
 networks:
   currency_network:
