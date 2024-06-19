@@ -32,8 +32,10 @@ jobs:
     - name: Build and run tests using Docker Compose
       env:
         SA_PASSWORD: ${{ secrets.SA_PASSWORD }}
-        CurrencyRateEndpoint: ${{ secrets.CurrencyRateEndpoint }}
+        CurrencyRateEndpoint: ${{ secrets.CURRENCYRATEENDPOINT }}
         ConnectionStrings__CurrencyRateConnection: ${{ secrets.CONNECTIONSTRINGS__CURRENCYRATECONNECTION }}
+        RabbitMQ__User: ${{ secrets.RABBITMQ__USER }}
+        RabbitMQ__Password: ${{ secrets.RABBITMQ__PASSWORD }}
       run: |
         docker-compose -f docker-compose.ci-test.yaml up --build --abort-on-container-exit --exit-code-from currencyratetest
 

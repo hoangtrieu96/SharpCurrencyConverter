@@ -82,6 +82,7 @@ services:
       RABBITMQ_DEFAULT_PASS: "${RabbitMQ__Password}"
     networks:
       - currency_network
+    platform: linux/amd64
 
 networks:
   currency_network:
