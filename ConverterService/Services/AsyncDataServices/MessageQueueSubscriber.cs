@@ -30,8 +30,8 @@ public class MessageQueueSubscriber : BackgroundService
         string exchangeName = _configuration["RabbitMQ:RateUpdateMQ:ExchangeName"]!;
         string routingKey = _configuration["RabbitMQ:RateUpdateMQ:RoutingKey"]!;
 
-        Console.WriteLine("Host", _configuration["RabbitMQ:Host"]);
-        Console.WriteLine("Port", _configuration["RabbitMQ:Port"]);
+        Console.WriteLine($"Host: {_configuration["RabbitMQ:Host"]}");
+        Console.WriteLine($"Port: {_configuration["RabbitMQ:Port"]}");
 
         var factory = new ConnectionFactory
         {
