@@ -9,7 +9,6 @@ services:
       - sql_data:/var/opt/mssql
     networks:
       - currency_network
-    platform: linux/amd64
 
   rabbitmq: # Container port: 5672, 15672
     image: rabbitmq:3-management
@@ -22,7 +21,12 @@ services:
       RABBITMQ_DEFAULT_PASS: "${RabbitMQ__Password}"
     networks:
       - currency_network
-    platform: linux/amd64
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   currencyrateservice: # Container port: 8080
     image: trieuhoangnguyen/currencyrateservice:latest
@@ -37,18 +41,18 @@ services:
       - RabbitMQ__RateUpdateMQ__ExchangeName=rate_update
       - RabbitMQ__RateUpdateMQ__RoutingKey=rate_update
     depends_on:
-      - sqlserver
-      - rabbitmq
+      sqlserver:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     networks:
       - currency_network
-    platform: linux/amd64
 
   redis: # Container port: 6379
     image: redis:latest
     container_name: redis
     networks:
       - currency_network
-    platform: linux/amd64
 
   converterservice: # Container port: 8080
     image: trieuhoangnguyen/converterservice:latest
@@ -63,12 +67,14 @@ services:
       - RabbitMQ__RateUpdateMQ__ExchangeName=rate_update
       - RabbitMQ__RateUpdateMQ__RoutingKey=rate_update
     depends_on:
-      - redis
-      - rabbitmq
-      - currencyrateservice
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      currencyrateservice:
+        condition: service_started
     networks:
       - currency_network
-    platform: linux/amd64
 
   nginx: # Container port: 80
     image: nginx:latest
@@ -82,7 +88,6 @@ services:
       - converterservice
     networks:
       - currency_network
-    platform: linux/amd64
 
 networks:
   currency_network:

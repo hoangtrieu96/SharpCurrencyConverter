@@ -23,6 +23,12 @@ services:
     networks:
       - currency_network
     platform: linux/amd64
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   currencyrateservice: # Container port: 8080
     build:
@@ -41,8 +47,10 @@ services:
       - RabbitMQ__RateUpdateMQ__ExchangeName=rate_update
       - RabbitMQ__RateUpdateMQ__RoutingKey=rate_update
     depends_on:
-      - sqlserver
-      - rabbitmq
+      sqlserver:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     networks:
       - currency_network
     platform: linux/amd64
@@ -83,9 +91,12 @@ services:
       - RabbitMQ__RateUpdateMQ__ExchangeName=rate_update
       - RabbitMQ__RateUpdateMQ__RoutingKey=rate_update
     depends_on:
-      - redis
-      - rabbitmq
-      - currencyrateservice
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      currencyrateservice:
+        condition: service_started
     networks:
       - currency_network
     platform: linux/amd64
