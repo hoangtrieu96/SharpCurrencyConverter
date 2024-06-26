@@ -1,4 +1,5 @@
 using ConverterService.Data;
+using ConverterService.Services.AsyncDataServices;
 using ConverterService.Services.SyncDataServices;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
@@ -16,6 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
     });
     builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration["Redis:ConnectionString"]!));
     builder.Services.AddScoped(typeof(ICacheService<>), typeof(CacheServiceRedis<>));
+    builder.Services.AddHostedService<MessageQueueSubscriber>();
 }
 
 var app = builder.Build();

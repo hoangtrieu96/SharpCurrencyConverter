@@ -8,12 +8,13 @@ namespace ConverterService.Services.SyncDataServices;
 public class GrpcConverterService : GrpcConverter.GrpcConverterBase
 {
     private readonly ICurrencyRateClient _currencyRateClient;
-    private readonly ICacheService<decimal?> _cacheService;
+    private readonly ICacheService<Dictionary<string, decimal>?> _cacheService;
+    private readonly string _cacheCurrencyRatesKey = "CurrencyRates";
 
-    public GrpcConverterService(ICurrencyRateClient currencyRateClient, ICacheService<decimal?> cacheService)
+    public GrpcConverterService(ICurrencyRateClient currencyRateClient, ICacheService<Dictionary<string, decimal>?> cacheService)
     {
-        _currencyRateClient = currencyRateClient;
-        _cacheService = cacheService;
+        _currencyRateClient = currencyRateClient ?? throw new ArgumentNullException(nameof(currencyRateClient));
+        _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
     }
 
     public override async Task<ConversionResultResponse> GetConversionResult(ConversionResultRequest request, ServerCallContext context)
@@ -21,15 +22,34 @@ public class GrpcConverterService : GrpcConverter.GrpcConverterBase
         ValidateConversionResultRequest(request);
 
         // Retrieve currency rates from cache first, if not found, fetch from CurrencyRateService
-        decimal? fromRate = await _cacheService.GetAsync(request.FromCurrencyCode);
-        decimal? toRate = await _cacheService.GetAsync(request.ToCurrencyCode);
+        decimal? fromRate = null;
+        decimal? toRate = null;
+        string fromCurrencyCode = request.FromCurrencyCode.ToUpper();
+        string toCurrencyCode = request.ToCurrencyCode.ToUpper();
+        
+        Dictionary<string, decimal>? currencyRates = await _cacheService.GetAsync(_cacheCurrencyRatesKey); 
+        if (currencyRates != null)
+        {
+            if (currencyRates.ContainsKey(fromCurrencyCode) && currencyRates.ContainsKey(toCurrencyCode))
+            {
+                fromRate = currencyRates[fromCurrencyCode];
+                toRate = currencyRates[toCurrencyCode];
+            }
+        } 
+        else
+        {
+            currencyRates = [];
+        }
+
+        // Get rates from CurrencyRateService if not found in cache
         if (!fromRate.HasValue || !toRate.HasValue)
         {
-            (fromRate, toRate) = await GetRates(request.FromCurrencyCode, request.ToCurrencyCode);
+            (fromRate, toRate) = await GetRates(fromCurrencyCode, toCurrencyCode);
             
             // Update cache with latest rates
-            await _cacheService.SetAsync(request.FromCurrencyCode, fromRate, TimeSpan.FromMinutes(10));
-            await _cacheService.SetAsync(request.ToCurrencyCode, toRate, TimeSpan.FromMinutes(10));
+            currencyRates[fromCurrencyCode] = fromRate.Value;
+            currencyRates[toCurrencyCode] = toRate.Value;
+            await _cacheService.SetAsync(_cacheCurrencyRatesKey, currencyRates, TimeSpan.FromMinutes(10));
         }
 
         // Convert amount

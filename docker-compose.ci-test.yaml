@@ -10,6 +10,25 @@ services:
     networks:
       - currency_network
     platform: linux/amd64
+    
+  rabbitmq: # Container port: 5672, 15672
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"   # RabbitMQ server port
+      - "15672:15672" # Management plugin web interface
+    environment:
+      RABBITMQ_DEFAULT_USER: "${RabbitMQ__User}"
+      RABBITMQ_DEFAULT_PASS: "${RabbitMQ__Password}"
+    networks:
+      - currency_network
+    platform: linux/amd64
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   currencyrateservice: # Container port: 8080
     build:
@@ -21,8 +40,17 @@ services:
     environment:
       - CurrencyRateEndpoint=${CurrencyRateEndpoint}
       - ConnectionStrings__CurrencyRateConnection=${ConnectionStrings__CurrencyRateConnection}
+      - RabbitMQ__User=${RabbitMQ__User}
+      - RabbitMQ__Password=${RabbitMQ__Password}
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Port=5672
+      - RabbitMQ__RateUpdateMQ__ExchangeName=rate_update
+      - RabbitMQ__RateUpdateMQ__RoutingKey=rate_update
     depends_on:
-      - sqlserver
+      sqlserver:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     networks:
       - currency_network
     platform: linux/amd64
@@ -41,7 +69,9 @@ services:
 
   redis: # Container port: 6379
     image: redis:latest
-    container_name: my_redis
+    container_name: redis
+    networks:
+      - currency_network
     platform: linux/amd64
 
   converterservice: # Container port: 8080
@@ -54,9 +84,19 @@ services:
     environment:
       - GrpcCurrencyRateService=http://currencyrateservice:8080
       - Redis__ConnectionString=redis:6379,abortConnect=false
+      - RabbitMQ__User=${RabbitMQ__User}
+      - RabbitMQ__Password=${RabbitMQ__Password}
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Port=5672
+      - RabbitMQ__RateUpdateMQ__ExchangeName=rate_update
+      - RabbitMQ__RateUpdateMQ__RoutingKey=rate_update
     depends_on:
-      - redis
-      - currencyrateservice
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      currencyrateservice:
+        condition: service_started
     networks:
       - currency_network
     platform: linux/amd64

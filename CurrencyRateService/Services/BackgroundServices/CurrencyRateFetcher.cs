@@ -4,6 +4,7 @@ using AutoMapper;
 using CurrencyRateService.Data;
 using CurrencyRateService.DTOs;
 using CurrencyRateService.Models;
+using CurrencyRateService.Services.AsyncDataServices;
 using CurrencyRateService.Utility;
 
 namespace CurrencyRateService.Services.BackgroundServices;
@@ -16,13 +17,15 @@ public class CurrencyRateFetcher : BackgroundService
     private readonly HttpClient _httpClient;
     private readonly IMapper _mapper;
     private readonly IServiceProvider _serviceProvider;
+    private readonly IMessageQueueProducer _messageQueueProducer;
 
     public CurrencyRateFetcher(
         ILogger<CurrencyRateFetcher> logger,
         IConfiguration configuration,
         HttpClient httpClient,
         IMapper mapper,
-        IServiceProvider serviceProvider
+        IServiceProvider serviceProvider,
+        IMessageQueueProducer messageQueueProducer
     )
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -31,6 +34,7 @@ public class CurrencyRateFetcher : BackgroundService
         _currentcyRateUrl = configuration["CurrencyRateEndpoint"] ?? throw new ArgumentNullException("CurrencyRateEndpoint");
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+        _messageQueueProducer = messageQueueProducer ?? throw new ArgumentNullException(nameof(messageQueueProducer));
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -40,7 +44,7 @@ public class CurrencyRateFetcher : BackgroundService
         while (!stoppingToken.IsCancellationRequested)
         {
             await FetchCurrencyRates();
-            await Task.Delay(600000, stoppingToken);
+            await Task.Delay(300000, stoppingToken);
         }
 
         _logger.LogInformation($"{nameof(CurrencyRateFetcher)} stopped");
@@ -59,6 +63,9 @@ public class CurrencyRateFetcher : BackgroundService
                                                 ?? throw new JsonException("Failed to parse the response.");
 
             await UpsertCurrencyRates(exchangeRateAPIReadDTO);
+
+            // Send an event to message queue to notify other services that the currency rate data has been updated
+            _messageQueueProducer.PublishRateUpdateEvent();
         }
         catch (Exception ex)
         {
@@ -69,7 +76,7 @@ public class CurrencyRateFetcher : BackgroundService
     private async Task UpsertCurrencyRates(ExchangeRateAPIReadDTO exchangeRateAPIReadDTO)
     {
         using var scope = _serviceProvider.CreateScope();
-        ICurrencyRateRepo _currencyRateRepo = scope.ServiceProvider.GetRequiredService<ICurrencyRateRepo>();
+        ICurrencyRateRepo currencyRateRepo = scope.ServiceProvider.GetRequiredService<ICurrencyRateRepo>();
         
         foreach (var rate in exchangeRateAPIReadDTO.ConversionRates)
         {
@@ -87,10 +94,10 @@ public class CurrencyRateFetcher : BackgroundService
                     NextUpdateAt = exchangeRateAPIReadDTO.TimeNextUpdateUnix
                 };
 
-                await _currencyRateRepo.UpsertRate(_mapper.Map<CurrencyRate>(rateWriteDTO));
+                await currencyRateRepo.UpsertRate(_mapper.Map<CurrencyRate>(rateWriteDTO));
             }
         }
 
-        await _currencyRateRepo.SaveChanges();
+        await currencyRateRepo.SaveChanges();
     }
 }

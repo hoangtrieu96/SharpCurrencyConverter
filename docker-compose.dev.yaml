@@ -13,26 +13,25 @@ services:
       - currency_network
     platform: linux/amd64
 
-  currencyrateservice:
-    image: trieuhoangnguyen/currencyrateservice:latest
-    container_name: currencyrateservice
-    ports:
-      - "8080:8080"
-    environment:
-      - CurrencyRateEndpoint=${CurrencyRateEndpoint}
-      - ConnectionStrings__CurrencyRateConnection=${ConnectionStrings__CurrencyRateConnection}
-    depends_on:
-      - sqlserver
-    networks:
-      - currency_network
-    platform: linux/amd64
-
   redis:
     image: redis:latest
-    container_name: my_redis
+    container_name: redis
     ports:
       - "6379:6379"
-    platform: linux/amd64
+    networks:
+      - currency_network
+  
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"   # RabbitMQ server port
+      - "15672:15672" # Management plugin web interface
+    environment:
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "guest"
+    networks:
+      - currency_network
 
 networks:
   currency_network:
